@@ -4,6 +4,10 @@ var radius = 0
 //variable for keydown
 var spacepress = false;
 var onetry = 0;
+var stop = false;
+
+var background = ""
+var backgroundimgs = ['backgroundimg.jpg', 'backgroundimg2.jpg', 'background3.png'];
 
 class Platform{
   //sets x, y, width, and height
@@ -38,12 +42,23 @@ class Person{
     this.rectHeight = 30;
   }
 
+  getptx(){ return this.ptx; }
+
+  // get ptx(){ return this.ptx; }
+  // set ptx(newptx) { this.ptx = newptx; }
+  // get pty(){ return this.pty; }
+  // set pty(newpty) { this.pty = newpty; }
+
   draw(){
     context.beginPath();
     context.fillRect(this.ptx, this.pty, this.rectWidth, this.rectHeight);
     context.stroke();
 
-    console.log(this.ptx, this.pty, this.rectWidth, this.rectHeight);
+    //console.log(this.ptx, this.pty, this.rectWidth, this.rectHeight);
+  }
+
+  animate(){
+    this.ptx += 5;
   }
 }
 
@@ -67,6 +82,7 @@ class Line{
   get y2(){ return this.pt2[1]; }
   set y2(newY2){ this.pt2[1] = newY2; }
 
+  getx2() { return this.pt2[0]; }
   getRadius(){ return this.pt1[1] - this.pt2[1]; }
 
   move(){
@@ -92,6 +108,16 @@ class Line{
     context.lineTo(this.pt2[0], this.pt2[1]);
     context.stroke();
   }
+}
+
+function getBackgroundImg(){
+  /*
+    Parameters: None
+    Returns: None
+    Purpose: generates a random background from a list of backgrounds
+  */
+  index = Math.random() * backgroundimgs.length;
+  background = backgroundimgs[index];
 }
 
 function getRandomWidth(){
@@ -145,11 +171,19 @@ function drawAll(){
     radius = line.getRadius();
   }
 
-  if (onetry > 1){
+  if (onetry == 2){
     if (angle >= 0){
       line.fall();
       line.draw();
       angle -= 1;
+    }
+  }
+
+  if (onetry > 2 && stop == false){
+    ninja.animate();
+    console.log(ninja.getptx(), line.getx2());
+    if(ninja.getptx() > line.getx2()){
+      stop = true;
     }
   }
 
@@ -171,6 +205,9 @@ canvas.style.border = "1px solid black";
 
 //set the animation to 2-D
 context = canvas.getContext("2d");
+
+//set background image
+document.body.style.backgroundImage = "url('backgroundimg2.jpg')";
 
 //add event listener for key press
 document.addEventListener("keydown", myKeyDown);
