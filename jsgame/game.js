@@ -5,6 +5,8 @@ var radius = 0
 var spacepress = false;
 var onetry = 0;
 var stop = false;
+var falldown = false;
+var success = false;
 
 var background = ""
 var backgroundimgs = ['backgroundimg.jpg', 'backgroundimg2.jpg', 'background3.png'];
@@ -27,6 +29,7 @@ class Platform{
   //draws platform (filler = black)
   draw(){
     context.beginPath();
+    context.fillStyle = "black";
     context.fillRect(this.ptx, this.pty, this.rectWidth, this.rectHeight);
     context.stroke();
   }
@@ -40,9 +43,13 @@ class Person{
     this.pty = platform1.getpty() - 30;
     this.rectWidth = 25;
     this.rectHeight = 30;
+
+    this.img = new Image();
+    this.img.src = "stickninja.png";
   }
 
   getptx(){ return this.ptx; }
+  getpty(){ return this.pty; }
 
   // get ptx(){ return this.ptx; }
   // set ptx(newptx) { this.ptx = newptx; }
@@ -50,15 +57,17 @@ class Person{
   // set pty(newpty) { this.pty = newpty; }
 
   draw(){
-    context.beginPath();
-    context.fillRect(this.ptx, this.pty, this.rectWidth, this.rectHeight);
-    context.stroke();
+    context.drawImage(this.img, 0, 0, 103, 100, this.ptx, this.pty, this.rectWidth, this.rectHeight);
 
     //console.log(this.ptx, this.pty, this.rectWidth, this.rectHeight);
   }
 
   animate(){
     this.ptx += 5;
+  }
+
+  fall(){
+    this.pty += 50;
   }
 }
 
@@ -151,6 +160,12 @@ function myKeyUp(event){
   spacepress = false;
 }
 
+function checkSuccess(pPos, rectX1, rectX2){
+  if (pPos < rectX1) return false;
+  else if (pPos > rectX2) return false;
+  else return true;
+}
+
 function drawAll(){
   /*
     Parameters: None (calls on other functions/methods)
@@ -187,6 +202,37 @@ function drawAll(){
     }
   }
 
+  if(stop == true){
+    if (falldown == false){
+      if (checkSuccess(ninja.getptx(), platform2.getptx(), platform2.getptx() + platform2.getrectWidth()) == false){
+        console.log("fall down");
+        ninja.fall();
+        if (ninja.getpty() > windowHeight){
+          falldown = true;
+        }
+      }
+      else if (checkSuccess(ninja.getptx(), platform2.getptx(), platform2.getptx() + platform2.getrectWidth()) == true) {
+        success = true;
+      }
+    }
+
+  }
+
+  if (falldown == true){
+    document.body.style.backgroundImage = "url('backgroundimg3.png')";
+
+    context.font = "50px Georgia"; 
+    context.fillStyle = "white";
+    context.fillText("You fell :(", windowWidth/2 - windowWidth/5, windowHeight/2 - windowHeight/10);
+  }
+  if (success == true) {
+    document.body.style.backgroundImage = "url('backgroundimg.jpg')";
+
+    context.font = "50px Georgia"; 
+    context.fillStyle = "white";
+    context.fillText("Success!", windowWidth/2 - windowWidth/5, windowHeight/2 - windowHeight/10);
+  }
+
   window.requestAnimationFrame(drawAll);
 }
 
@@ -218,6 +264,7 @@ platform1 = new Platform(10, getRandomWidth(), windowHeight);
 platform2 = new Platform((windowWidth/8) * 5, getRandomWidth(), windowHeight);
 
 //gets the image from html
+
 //img = document.getElementById("stickninja");
 
 //icon for little stick Ninja
